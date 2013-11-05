@@ -82,6 +82,7 @@ if (isset($_GET['action']) && $_GET['action'] == "refresh") {
 	}
 	redirect(FUSION_SELF.$aidlink);
 } elseif (isset($_GET['enable'])
+		&& preg_match("/^([a-z0-9_-]){2,50}$/i", stripinput($_GET['enable']))
 		&& file_exists(INCLUDES."user_fields/".stripinput($_GET['enable'])."_include_var.php")
 		&& file_exists(INCLUDES."user_fields/".stripinput($_GET['enable'])."_include.php")
 ) {

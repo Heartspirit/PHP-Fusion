@@ -103,9 +103,9 @@ if (isset($_POST['save'])) {
 			$news_image_t2 = "";
 		}
 	} else {
-		$news_image = (isset($_POST['news_image']) ? $_POST['news_image'] : "");
-		$news_image_t1 = (isset($_POST['news_image_t1']) ? $_POST['news_image_t1'] : "");
-		$news_image_t2 = (isset($_POST['news_image_t2']) ? $_POST['news_image_t2'] : "");
+		$news_image = (isset($_POST['news_image']) ? (preg_match("/^[-0-9A-Z_\.\[\]]+$/i", $_POST['news_image']) ? $_POST['news_image'] : "") : "");
+		$news_image_t1 = (isset($_POST['news_image_t1']) ? (preg_match("/^[-0-9A-Z_\.\[\]]+$/i", $_POST['news_image_t1']) ? $_POST['news_image_t1'] : "") : "");
+		$news_image_t2 = (isset($_POST['news_image_t2']) ? (preg_match("/^[-0-9A-Z_\.\[\]]+$/i", $_POST['news_image_t2']) ? $_POST['news_image_t2'] : "") : "");
 	}
 	$body = addslash($_POST['body']);
 	if ($_POST['body2']) {

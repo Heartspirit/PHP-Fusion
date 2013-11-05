@@ -93,6 +93,7 @@ if (isset($_POST['postnewthread'])) {
 	$sig = isset($_POST['show_sig']) ? 1 : 0;
 	$smileys = isset($_POST['disable_smileys']) || preg_match("#(\[code\](.*?)\[/code\]|\[geshi=(.*?)\](.*?)\[/geshi\]|\[php\](.*?)\[/php\])#si", $message) ? 0 : 1;
 	$thread_poll = 0;
+	$poll_opts = array();
 
 	if ($fdata['forum_poll'] && checkgroup($fdata['forum_poll'])) {
 		if (isset($_POST['poll_options']) && is_array($_POST['poll_options'])) {

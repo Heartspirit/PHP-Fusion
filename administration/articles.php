@@ -108,7 +108,13 @@ if (!empty($result)) {
 		}
 
 		if ((isset($_GET['action']) && $_GET['action'] == "edit") && (isset($_POST['article_id']) && isnum($_POST['article_id'])) || (isset($_GET['article_id']) && isnum($_GET['article_id']))) {
-			$result = dbquery("SELECT article_cat, article_subject, article_snippet, article_article, article_draft, article_breaks, article_allow_comments, article_allow_ratings FROM ".DB_ARTICLES." WHERE article_id='".(isset($_POST['article_id']) ? $_POST['article_id'] : $_GET['article_id'])."'");
+			$id = "";
+			if (isset($_POST['article_id']) && isnum($_POST['article_id'])) {
+				$id = $_POST['article_id'];
+			} elseif (isset($_GET['article_id']) && isnum($_GET['article_id'])) {
+				$id = $_GET['article_id'];
+			}
+			$result = dbquery("SELECT article_cat, article_subject, article_snippet, article_article, article_draft, article_breaks, article_allow_comments, article_allow_ratings FROM ".DB_ARTICLES." WHERE article_id='".$id."'");
 			if (dbrows($result)) {
 				$data = dbarray($result);
 				$article_cat = $data['article_cat'];

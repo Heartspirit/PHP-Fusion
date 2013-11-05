@@ -485,8 +485,9 @@ if (!isset($_GET['msg_send']) && !isset($_GET['msg_read']) && $_GET['folder'] !=
 		$reply_message = "";
 	}
 
+	$user_list = ""; $user_types = "";
 	if (!isset($_POST['chk_sendtoall']) || $_GET['msg_send'] != "0") {
-		$user_list = ""; $user_types = ""; $sel = "";
+		$sel = "";
 		$result = dbquery("SELECT user_id, user_name FROM ".DB_USERS." WHERE user_status='0' ORDER BY user_level DESC, user_name ASC");
 		while ($data = dbarray($result)) {
 			if ($data['user_id'] != $userdata['user_id']) {

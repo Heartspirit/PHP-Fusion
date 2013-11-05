@@ -182,6 +182,7 @@ function upload_image(
 			$image_name = stripfilename(substr($image['name'], 0, strrpos($image['name'], ".")));
 		}
 		$image_ext = strtolower(strrchr($image['name'],"."));
+		if (filesize($image['tmp_name']) > 10 && @getimagesize($image['tmp_name'])) {
 		$image_res = @getimagesize($image['tmp_name']);
 		$image_info = array(
 			"image" => false, "image_name" => $image_name.$image_ext, "image_ext" => $image_ext,
@@ -196,7 +197,7 @@ function upload_image(
 		if ($image['size'] > $max_size){
 			// Invalid file size
 			$image_info['error'] = 1;
-		} elseif (!$filetype) {
+		} elseif (!$filetype || !verify_image($image['tmp_name'])) {
 			// Unsupported image type
 			$image_info['error'] = 2;
 		} elseif ($image_res[0] > $target_width || $image_res[1] > $target_height) {
@@ -253,6 +254,10 @@ function upload_image(
 					$image_info['image'] = false;
 				}
 			}
+		}
+		} else {
+			// The image is invalid
+			$image_info = array("error" => 2);
 		}
 	} else {
 		// Image not uploaded

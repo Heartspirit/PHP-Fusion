@@ -370,6 +370,7 @@ if ($rows != 0) {
 		$words = explode(" ", urldecode($_GET['highlight']));
 		$higlight = ""; $i = 1; $c_words = count($words);
 		foreach ($words as $hlight) {
+			$hlight = htmlentities($hlight, ENT_QUOTES);
 			$higlight .= "'".$hlight."'";
 			$higlight .= ($i < $c_words ? "," : "");
 			$i++;

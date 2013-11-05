@@ -41,10 +41,13 @@ if ($profile_method == "input") {
 } elseif ($profile_method == "validate_insert"  || $profile_method == "validate_update") {
 	if ($settings['userthemes'] == 1 || iADMIN) {
 		// Get input data
-		if (isset($_POST['user_theme']) && $_POST['user_theme'] != "") {
+		$input_theme = isset($_POST['user_theme']) ? stripinput($_POST['user_theme']) : "";
+		if (theme_exists($input_theme)) {
 			// Set update or insert user data
-			$this->_setDBValue("user_theme", stripinput(trim($_POST['user_theme'])));
-			if (stripinput(trim($_POST['user_theme'])) != $this->userData['user_theme']) $this->_themeChanged = true;
+			$this->_setDBValue("user_theme", $input_theme);
+			if (isset($this->userData['user_theme'])) {
+				if ($input_theme != $this->userData['user_theme']) $this->_themeChanged = true;
+			}
 		} else {
 			$this->_setError("user_theme", $locale['uf_theme_error'], true);	
 		}

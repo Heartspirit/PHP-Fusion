@@ -303,36 +303,48 @@ function dbconnect($db_host, $db_user, $db_pass, $db_name) {
 }
 
 // Set theme
-if (!theme_exists($userdata['user_theme'])) {
-	echo "<strong>".$userdata['user_theme']." - ".$locale['global_300'].".</strong><br /><br />\n";
-	echo $locale['global_301'];
-	die();
-}
+set_theme($userdata['user_theme']);
 
-// Check that site or user theme exists
+// Check if a given theme exists and is valid
 function theme_exists($theme) {
 	global $settings;
 
 	if ($theme == "Default") { $theme = $settings['theme']; }
-	if (!file_exists(THEMES) || !is_dir(THEMES)) {
+	if (!file_exists(THEMES) || !is_dir(THEMES) || !is_string($theme) || !preg_match("/^([a-z0-9_-]){2,50}$/i", $theme) || !file_exists(THEMES.$theme)) {
 		return false;
 	} elseif (file_exists(THEMES.$theme."/theme.php") && file_exists(THEMES.$theme."/styles.css")) {
-		define("THEME", THEMES.$theme."/");
 		return true;
 	} else {
-		$dh = opendir(THEMES);
-		while (false !== ($entry = readdir($dh))) {
-			if ($entry != "." && $entry != ".." && is_dir(THEMES.$entry)) {
-				if (file_exists(THEMES.$entry."/theme.php") && file_exists(THEMES.$entry."/styles.css")) {
-					define("THEME", THEMES.$entry."/");
-					return true;
-					exit;
+		return false;
+	}
+}
+
+// Set a valid theme
+function set_theme($theme) {
+	global $settings, $locale;
+
+	if (!defined("THEME")) {
+		// If the theme is valid set it
+		if (theme_exists($theme)) {
+			define("THEME", THEMES.($theme == "Default" ? $settings['theme'] : $theme)."/");
+		// The theme is invalid, search for a valid one inside themes folder and set it
+		} else {
+			$dh = opendir(THEMES);
+			while (false !== ($entry = readdir($dh))) {
+				if ($entry != "." && $entry != ".." && is_dir(THEMES.$entry)) {
+					if (theme_exists($entry)) {
+						define("THEME", THEMES.$entry."/");
+						break;
+					}
 				}
 			}
+			closedir($dh);
 		}
-		closedir($dh);
+		// If can't find and set any valid theme show a warning
 		if (!defined("THEME")) {
-			return false;
+			echo "<strong>".$theme." - ".$locale['global_300'].".</strong><br /><br />\n";
+			echo $locale['global_301'];
+			die();
 		}
 	}
 }
@@ -668,7 +680,8 @@ function descript($text, $striptags = true) {
 function verify_image($file) {
 	$txt = file_get_contents($file);
 	$image_safe = true;
-	if (preg_match('#&(quot|lt|gt|nbsp|<?php);#i', $txt)) { $image_safe = false; }
+	if (preg_match('#<?php#i', $txt)) { $image_safe = false; }
+	elseif (preg_match('#&(quot|lt|gt|nbsp|<?php);#i', $txt)) { $image_safe = false; }
 	elseif (preg_match("#&\#x([0-9a-f]+);#i", $txt)) { $image_safe = false; }
 	elseif (preg_match('#&\#([0-9]+);#i', $txt)) { $image_safe = false; }
 	elseif (preg_match("#([a-z]*)=([\`\'\"]*)script:#iU", $txt)) { $image_safe = false; }
