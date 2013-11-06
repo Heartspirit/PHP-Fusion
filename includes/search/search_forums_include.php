@@ -65,7 +65,7 @@ if ($_GET['stype'] == "forums" || $_GET['stype']=="all") {
 		);		
 		while ($data = dbarray($result)) {
 			$search_result = "";
-			$text_all = search_striphtmlbbcodes($data['post_message']);
+			$text_all = search_striphtmlbbcodes(iADMIN ? $data['post_message'] : preg_replace("#\[hide\](.*)\[/hide\]#si", "", $data['post_message']));
 			$text_frag = search_textfrag($text_all);
 			$subj_c = search_stringscount($data['thread_subject']);
 			$text_c = search_stringscount($data['post_message']);;
