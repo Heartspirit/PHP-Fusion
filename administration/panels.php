@@ -24,7 +24,7 @@ include LOCALE.LOCALESET."admin/panels.php";
 
 add_to_head("<script type='text/javascript' src='".INCLUDES."jquery/jquery-ui.js'></script>");
 add_to_head("<link rel='stylesheet' href='".THEMES."templates/panels.css' type='text/css' media='all' />");
-add_to_head("<script type='text/javascript'>
+add_to_footer("<script type='text/javascript'>
 $(document).ready(function() {
 	$('.pdisabled').fadeTo(0, .5);
 	$('.panels-list').sortable({
@@ -57,7 +57,7 @@ $(document).ready(function() {
 			ul.find('.pside').each(function() {
 				$(this).text(psidetext);
 			});
-			$('#info').load('panels_updater.php".$aidlink."&panel_side='+pdata+'&'+order);
+			$('#info').load('panels_updater.php".$aidlink."&amp;panel_side='+pdata+'&amp;'+order);
 		}
 	});
 });

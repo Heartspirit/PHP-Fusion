@@ -55,7 +55,7 @@ if (isset($_GET['cat_id']) && isnum($_GET['cat_id'])) {
 		echo "<!--pre_news_cat_idx--><table cellpadding='0' cellspacing='1' width='100%' class='tbl-border'>\n";
 		while ($data = dbarray($result)) {
 			$rows = dbcount("(news_id)", DB_NEWS, "news_cat='".$data['news_cat_id']."' AND ".groupaccess('news_visibility')." AND (news_start='0'||news_start<=".time().") AND (news_end='0'||news_end>=".time().") AND news_draft='0'");
-			echo "<tr>\n<td width='150' class='tbl1' style='vertical-align:top'><!--news_cat_image--><img src='".get_image("nc_".$data['news_cat_name'])."' alt='".$data['news_cat_name']."' /><br /><br />\n";
+			echo "<tr>\n<td width='150' class='tbl1' style='vertical-align:top'><!--news_cat_image--><img class='news-category' src='".get_image("nc_".$data['news_cat_name'])."' alt='".$data['news_cat_name']."' /><br /><br />\n";
 			echo "<strong>".$locale['401']."</strong> ".$data['news_cat_name']."<br />\n<strong>".$locale['402']."</strong> $rows</td>\n";
 			echo "<td class='tbl1' style='vertical-align:top'><!--news_cat_news-->\n";
 			if ($rows) {
