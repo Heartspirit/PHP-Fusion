@@ -37,9 +37,9 @@ opentable($locale['400']);
 $forum_list = ""; $current_cat = ""; $forumCollapsed = false; $forumCollapse = true;
 $result = dbquery(
 	"SELECT	f.forum_id, f.forum_cat, f.forum_name, f.forum_description, f.forum_moderators, f.forum_lastpost, f.forum_postcount,
-	f.forum_threadcount, f.forum_lastuser, f.forum_access, f2.forum_name AS forum_cat_name,
+	f.forum_threadcount, f.forum_lastuser, f.forum_access, f2.forum_name AS forum_cat_name, f2.forum_description AS forum_cat_description,
 	t.thread_id, t.thread_lastpost, t.thread_lastpostid, t.thread_subject,
-	u.user_id, u.user_name, u.user_status
+	u.user_id, u.user_name, u.user_status, u.user_avatar
 	FROM ".DB_FORUMS." f
 	LEFT JOIN ".DB_FORUMS." f2 ON f.forum_cat = f2.forum_id
 	LEFT JOIN ".DB_THREADS." t ON f.forum_id = t.forum_id AND f.forum_lastpost=t.thread_lastpost
@@ -57,16 +57,24 @@ if (dbrows($result) != 0) {
 			set_meta("description", $data['forum_cat_name']);
 		}
 		if ($data['forum_cat_name'] != $current_cat) {
-			if ($i > 0) { echo "</table>\n".($forumCollapse ? "</div>\n" : "")."<br />\n"; }
+			if ($i > 0) { echo "</tbody></table>\n<!--sub_forum_idx_table-->\n<br />\n"; }
 			$current_cat = $data['forum_cat_name'];
-			echo "<!--pre_forum_idx-->";
-			echo "<table cellpadding='0' cellspacing='0' width='100%' class='tbl-border forum_idx_table'>\n";
 			$forumStatus = ($forumCollapsed ? "off" : "on");
 			$boxname = "forum_".$data['forum_id'];
-			echo "<tr>\n<td colspan='4' class='forum-caption forum_cat_name'><!--forum_cat_name-->";
-			echo "<a href='".FORUM."index.php?cat=".$data['forum_cat']."'>".$data['forum_cat_name']."</a>";
-			echo "<div style='float:right;'>".($forumCollapse ? panelbutton($forumStatus, $boxname) : "")."</div>\n</td>\n</tr>\n";
-			echo ($forumCollapse ? "</table>".panelstate($forumStatus, $boxname)."<table cellpadding='0' cellspacing='1' width='100%' class='tbl-border'>\n" : "");
+			$element = "tbody";
+
+			if ($i == 0) { echo "<!--pre_forum_idx-->"; }
+			echo "<table class='tbl-border forum_idx_table' id='forum_cat_".$data['forum_cat']."' cellpadding='0' cellspacing='0' width='100%'>\n<thead>\n<tr class='forum-cat-head'>\n";
+			echo "<td class='forum-caption forum_cat_name' colspan='2'><!--forum_cat_name-->";
+			echo "<h3><a href='".FORUM."index.php?cat=".$data['forum_cat']."'>".$data['forum_cat_name']."</a></h3>";
+			if ($data['forum_cat_description']) {
+				echo "<span class='forum-cat-description small'>".nl2br(parseubb($data['forum_cat_description']))."</span>";
+			}
+			echo "</td>\n";
+			echo "<td class='forum-caption' width='12%' style='white-space:nowrap'>".$locale['402']." / ".$locale['403']."</td>\n";
+			echo "<td class='forum-caption' width='160'><span class='flleft'>".$locale['404']."</span>".($forumCollapse ? "<div class='flright'>".panelbutton($forumStatus, $boxname)."</div>\n" : "")."</td>\n";
+			echo "</tr>\n</thead>\n";
+			echo ($forumCollapse ? "".panelstate($forumStatus, $boxname, "tbody")."\n" : "<tbody>");
 		}
 		$i++;
 
@@ -79,31 +87,42 @@ if (dbrows($result) != 0) {
 			}
 		}
 		$forum_match = "\|".$data['forum_lastpost']."\|".$data['forum_id'];
+		$fclass = 'icon-old';
 		if ($data['forum_lastpost'] > $lastvisited) {
 			if (iMEMBER && ($data['forum_lastuser'] == $userdata['user_id'] || preg_match("({$forum_match}\.|{$forum_match}$)", $userdata['user_threads']))) {
 				$fim = "<img src='".get_image("folder")."' alt='".$locale['561']."' />";
 			} else {
 				$fim = "<img src='".get_image("foldernew")."' alt='".$locale['560']."' />";
+				$fclass = 'icon-new';
 			}
 		} else {
 			$fim = "<img src='".get_image("folder")."' alt='".$locale['561']."' />";
 		}
-		echo "<tr>\n";
-		echo "<td align='center' width='1%' class='tbl2' style='white-space:nowrap'>".$fim."</td>\n";
-		echo "<td class='tbl1 forum_name'><!--forum_name--><a href='viewforum.php?forum_id=".$data['forum_id']."'>".$data['forum_name']."</a><br />\n";
+		echo "<tr id='forum_".$data['forum_id']."' >\n";
+		echo "<td class='tbl2 forum-icon ".$fclass."' width='1%'>".$fim."</td>\n";
+		echo "<td class='tbl1 forum_name'><!--forum_name--><h3><a href='viewforum.php?forum_id=".$data['forum_id']."'>".$data['forum_name']."</a></h3><br />\n";
 		if ($data['forum_description'] || $moderators) {
-			echo "<span class='small'>".nl2br(parseubb($data['forum_description'])).($data['forum_description'] && $moderators ? "<br />\n" : "");
+			echo "<span class='forum-description small'>".nl2br(parseubb($data['forum_description'])).($data['forum_description'] && $moderators ? "<br />\n" : "");
 			echo ($moderators ? "<strong>".$locale['411']."</strong>".$moderators."</span>\n" : "</span>\n")."\n";
 		}
 		echo "</td>\n";
-		echo "<td align='center' width='10%' class='tbl2' style='white-space:nowrap'>".$locale['402'].": ".$data['forum_threadcount']."<br />\n";
-		echo $locale['403'].": ".$data['forum_postcount']."</td>\n";
-		echo "<td class='tbl1' width='20%' style='white-space:nowrap'>";
+		echo "<td class='tbl2 forum-stats'>\n";
+		echo "<dl class='threads-count'><dt class='flleft'>".$locale['402'].":</dt> <dd class='flright'>".$data['forum_threadcount']."</dd></dl>\n";
+		echo "<dl class='posts-count'><dt class='flleft'>".$locale['403'].":</dt> <dd class='flright'>".$data['forum_postcount']."</dd></dl>\n</td>\n";
+		echo "<td class='tbl1 forum-lastpost'>";
 		if ($data['forum_lastpost'] == 0) {
 			echo $locale['405']."</td>\n</tr>\n";
 		} else {
-			echo "<a href='".FORUM."viewthread.php?thread_id=".$data['thread_id']."' title='".$data['thread_subject']."'> ".trimlink($data['thread_subject'], 25)."</a> ";
-			echo "<a href='".FORUM."viewthread.php?thread_id=".$data['thread_id']."&amp;pid=".$data['thread_lastpostid']."#post_".$data['thread_lastpostid']."' title='".$data['thread_subject']."'>";
+			// Show avatar of the last user that made a post
+			if ($settings['forum_last_post_avatar'] == 1) {
+				$avatar = IMAGES."avatars/noavatar50.png";
+				if ($data['user_avatar'] && file_exists(IMAGES."avatars/".$data['user_avatar']) && $data['user_status']!=6 && $data['user_status']!=5) {
+					$avatar = IMAGES."avatars/".$data['user_avatar'];
+				}
+				echo "<div class='lastpost-avatar flleft'><img src='".$avatar."' alt='".$locale['567']."' /></div>\n";
+			}
+			echo "<a class='lastpost-title' href='".FORUM."viewthread.php?thread_id=".$data['thread_id']."' title='".$data['thread_subject']."'>".trimlink($data['thread_subject'], 25)."</a> ";
+			echo "<a class='lastpost-goto' href='".FORUM."viewthread.php?thread_id=".$data['thread_id']."&amp;pid=".$data['thread_lastpostid']."#post_".$data['thread_lastpostid']."' title='".$data['thread_subject']."'>";
 			if ($data['forum_lastpost'] > $lastvisited) {
 				if (iMEMBER && preg_match("({$forum_match}\.|{$forum_match}$)", $userdata['user_threads'])) {
 					$fim = "<img src='".get_image("lastpost")."' alt='".$locale['404']."' title='".$locale['404']."' />";
@@ -115,16 +134,17 @@ if (dbrows($result) != 0) {
 			}
 			echo $fim;
 			echo "</a><br />\n";
-			echo "<span class='small'>".$locale['406'].profile_link($data['forum_lastuser'], $data['user_name'], $data['user_status'])."</span><br />\n";
-			echo "<span class='small'>".showdate("forumdate", $data['forum_lastpost'])."</span></td>\n";
+			echo "<span class='lastpost-user small'>".profile_link($data['forum_lastuser'], $data['user_name'], $data['user_status'])."</span><br />\n";
+			echo "<span class='lastpost-date small'>".showdate("forumdate", $data['forum_lastpost'])."</span></td>\n";
 			echo "</tr>\n";
 		}
 	}
-	echo "</table>\n";
+	echo "</tbody></table>\n<!--sub_forum_idx_table-->\n";
 } else {
 	echo $locale['407']."\n";
 }
-echo "<!--sub_forum_idx_table-->\n<table cellpadding='0' cellspacing='0' width='100%'>\n<tr>\n";
+
+echo "<table cellpadding='0' cellspacing='0' width='100%'>\n<tr>\n";
 echo "<td class='forum'><br />\n";
 echo "<img src='".get_image("foldernew")."' alt='".$locale['560']."' style='vertical-align:middle;' /> - ".$locale['409']."<br />\n";
 echo "<img src='".get_image("folder")."' alt='".$locale['561']."' style='vertical-align:middle;' /> - ".$locale['410']."\n";
@@ -134,8 +154,6 @@ echo "<input type='hidden' name='stype' value='forums' />\n";
 echo "<input type='text' name='stext' class='textbox' style='width:150px' />\n";
 echo "<input type='submit' name='search' value='".$locale['550']."' class='button' />\n";
 echo "</form>\n</td>\n</tr>\n</table><!--sub_forum_idx-->\n";
-
-if ($i > 0) { echo "</div>\n"; }
 
 closetable();
 

@@ -69,6 +69,8 @@ if (isset($_POST['savesettings'])) {
 		if (!$result) { $error = 1; }
 		$result = dbquery("UPDATE ".DB_SETTINGS." SET settings_value='".(isnum($_POST['forum_last_posts_reply']) ? $_POST['forum_last_posts_reply'] : "0")."' WHERE settings_name='forum_last_posts_reply'");
 		if (!$result) { $error = 1; }
+		$result = dbquery("UPDATE ".DB_SETTINGS." SET settings_value='".(isnum($_POST['forum_last_post_avatar']) ? $_POST['forum_last_post_avatar'] : "0")."' WHERE settings_name='forum_last_post_avatar'");
+		if (!$result) { $error = 1; }
 		$result = dbquery("UPDATE ".DB_SETTINGS." SET settings_value='".(isnum($_POST['forum_editpost_to_lastpost']) ? $_POST['forum_editpost_to_lastpost'] : "0")."' WHERE settings_name='forum_editpost_to_lastpost'");
 		if (!$result) { $error = 1; }
 
@@ -127,6 +129,14 @@ echo "<option value='1'".($settings2['forum_ranks'] == "1" ? " selected='selecte
 echo "<option value='0'".($settings2['forum_ranks'] == "0" ? " selected='selected'" : "").">".$locale['519']."</option>\n";
 echo "</select></td>\n";
 echo "</tr>\n<tr>\n";
+// Show avatar with last post in forum
+echo "<td width='50%' class='tbl'>".$locale['539']."</td>\n";
+echo "<td width='50%' class='tbl'><select name='forum_last_post_avatar' class='textbox'>\n";
+echo "<option value='1'".($settings2['forum_last_post_avatar'] == "1" ? " selected='selected'" : "").">".$locale['518']."</option>\n";
+echo "<option value='0'".($settings2['forum_last_post_avatar'] == "0" ? " selected='selected'" : "").">".$locale['519']."</option>\n";
+echo "</select></td>\n";
+echo "</tr>\n<tr>\n";
+
 echo "<td width='50%' class='tbl'>".$locale['521']."<br /><span class='small2'>".$locale['522']."</span></td>\n";
 echo "<td width='50%' class='tbl'><select name='forum_edit_lock' class='textbox'>\n";
 echo "<option value='1'".($settings2['forum_edit_lock'] == "1" ? " selected='selected'" : "").">".$locale['518']."</option>\n";

@@ -40,6 +40,7 @@ echo "<head>\n<title>".$settings['sitename']."</title>\n";
 echo "<meta http-equiv='Content-Type' content='text/html; charset=".$locale['charset']."' />\n";
 echo "<meta name='description' content='".$settings['description']."' />\n";
 echo "<meta name='keywords' content='".$settings['keywords']."' />\n";
+echo "<link rel='stylesheet' href='".THEMES."templates/global.css' type='text/css' media='screen' />\n";
 echo "<link rel='stylesheet' href='".THEME."styles.css' type='text/css' media='screen' />\n";
 if (file_exists(IMAGES."favicon.ico")) { echo "<link rel='shortcut icon' href='".IMAGES."favicon.ico' type='image/x-icon' />\n"; }
 if (function_exists("get_head_tags")) { echo get_head_tags(); }

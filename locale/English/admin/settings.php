@@ -85,6 +85,7 @@ $locale['535'] = "Maximum number of attachments";
 $locale['536'] = "Time limit for editing posts:";
 $locale['537'] = "(In minutes, 0 for no limit)";
 $locale['538'] = "Update post datestamp for edited posts.";
+$locale['539'] = "Show avatar with last post in forum?";
 // Registration Settings
 $locale['550'] = "Registration";
 $locale['551'] = "Enable registration system?";

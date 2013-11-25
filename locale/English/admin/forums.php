@@ -10,6 +10,7 @@ $locale['413'] = "There are forums associated with this category";
 $locale['414'] = "Forum Category deleted";
 // Forum Category form
 $locale['420'] = "Category Name";
+$locale['420b'] = "Category Description";
 $locale['421'] = "Order";
 $locale['422'] = "Save Category";
 // Delete Forum Category

@@ -69,15 +69,16 @@ if (isset($_GET['status']) && !isset($message)) {
 
 if (isset($_POST['save_cat'])) {
 	$cat_name = trim(stripinput($_POST['cat_name']));
+	$cat_description = trim(stripinput($_POST['cat_description']));
 	if ($cat_name != "") {
 		if ((isset($_GET['action']) && $_GET['action'] == "edit") && (isset($_GET['forum_id']) && isnum($_GET['forum_id'])) && (isset($_GET['t']) && $_GET['t'] == "cat")) {
-			$result = dbquery("UPDATE ".DB_FORUMS." SET forum_name='$cat_name' WHERE forum_id='".$_GET['forum_id']."'");
+			$result = dbquery("UPDATE ".DB_FORUMS." SET forum_name='$cat_name', forum_description='$cat_description' WHERE forum_id='".$_GET['forum_id']."'");
 			redirect(FUSION_SELF.$aidlink."&status=savecu");
 		} else {
 			$cat_order = isnum($_POST['cat_order']) ? $_POST['cat_order'] : "";
 			if(!$cat_order) $cat_order=dbresult(dbquery("SELECT MAX(forum_order) FROM ".DB_FORUMS." WHERE forum_cat='0'"),0)+1;
 			$result = dbquery("UPDATE ".DB_FORUMS." SET forum_order=forum_order+1 WHERE forum_cat='0' AND forum_order>='$cat_order'");
-			$result = dbquery("INSERT INTO ".DB_FORUMS." (forum_cat, forum_name, forum_order, forum_description, forum_moderators, forum_access, forum_post, forum_reply, forum_poll, forum_vote, forum_attach, forum_lastpost, forum_lastuser) VALUES ('0', '$cat_name', '$cat_order', '', '', '0', '0', '0', '0', '0', '0', '0', '0')");
+			$result = dbquery("INSERT INTO ".DB_FORUMS." (forum_cat, forum_name, forum_order, forum_description, forum_moderators, forum_access, forum_post, forum_reply, forum_poll, forum_vote, forum_attach, forum_lastpost, forum_lastuser) VALUES ('0', '$cat_name', '$cat_order', '$cat_description', '', '0', '0', '0', '0', '0', '0', '0', '0')");
 			redirect(FUSION_SELF.$aidlink."&status=savecn");
 		}
 	} else {
@@ -155,10 +156,11 @@ if (isset($_POST['save_cat'])) {
 } else {
 	if ((isset($_GET['action']) && $_GET['action'] == "edit") && (isset($_GET['forum_id']) && isnum($_GET['forum_id']))) {
 		if (isset($_GET['t']) && $_GET['t'] == "cat") {
-			$result = dbquery("SELECT forum_id, forum_name FROM ".DB_FORUMS." WHERE forum_id='".$_GET['forum_id']."' LIMIT 1");
+			$result = dbquery("SELECT forum_id, forum_name, forum_description FROM ".DB_FORUMS." WHERE forum_id='".$_GET['forum_id']."' LIMIT 1");
 			if (dbrows($result)) {
 				$data = dbarray($result);
 				$cat_name = $data['forum_name'];
+				$cat_description = $data['forum_description'];
 				$cat_title = $locale['401'];
 				$cat_action = FUSION_SELF.$aidlink."&amp;action=edit&amp;forum_id=".$data['forum_id']."&amp;t=cat";
 				$forum_title = $locale['500'];
@@ -199,6 +201,7 @@ if (isset($_POST['save_cat'])) {
 		}
 	} else {
 		$cat_name = "";
+		$cat_description = "";
 		$cat_order = "";
 		$cat_title = $locale['400'];
 		$cat_action = FUSION_SELF.$aidlink;
@@ -223,11 +226,16 @@ if (isset($_POST['save_cat'])) {
 		echo "<table align='center' cellpadding='0' cellspacing='0' width='300'>\n<tr>\n";
 		echo "<td class='tbl'>".$locale['420']."<br />\n";
 		echo "<input type='text' name='cat_name' value='".$cat_name."' class='textbox' style='width:230px;' /></td>\n";
-		echo "<td width='50' class='tbl'>";
 		if (!isset($_GET['action']) || $_GET['action'] != "edit") {
-			echo $locale['421']."<br />\n<input type='text' name='cat_order' value='".$cat_order."' class='textbox' style='width:45px;' />";
+			echo "<td width='50' class='tbl'>";
+			echo $locale['421']."\n<input type='text' name='cat_order' value='".$cat_order."' class='textbox' style='width:45px;' />";
+			echo "</td>\n";
 		}
-		echo "</td>\n</tr>\n<tr>\n";
+		echo "</tr>\n";
+		echo "<tr>\n<td class='tbl' colspan='2'>".$locale['420b']."<br />\n";
+		echo "<textarea name='cat_description' cols='70' rows='4' class='textbox' style='width:98%'>".$cat_description."</textarea>\n";
+		echo display_bbcodes("280px;", "cat_description", "addcat", "b|i|u|color|url|center|size|big|small")."</td>\n";
+		echo "</tr>\n<tr>\n";
 		echo "<td align='center' colspan='2' class='tbl'>\n";
 		echo "<input type='submit' name='save_cat' value='".$locale['422']."' class='button' /></td>\n";
 		echo "</tr>\n</table>\n</form>\n";
@@ -261,7 +269,7 @@ if (isset($_POST['save_cat'])) {
 			echo "<input type='text' name='forum_name' value='".$forum_name."' class='textbox' style='width:285px;' /></td>\n";
 			echo "</tr>\n<tr>\n";
 			echo "<td colspan='2' class='tbl'>".$locale['521']."<br />\n";
-			echo "<textarea type='text' name='forum_description' cols='70' rows='4' class='textbox' style='width:98%'>".$forum_description."</textarea><br />\n";
+			echo "<textarea name='forum_description' cols='70' rows='4' class='textbox' style='width:98%'>".$forum_description."</textarea><br />\n";
 			echo display_bbcodes("280px;", "forum_description", "addforum", "b|i|u|color|url|center|size|big|small")."</td>\n";
 			echo "</tr>\n<tr>\n";
 			echo "<td class='tbl'>".$locale['522']."<br />\n";
@@ -376,7 +384,7 @@ if (isset($_POST['save_cat'])) {
 	opentable($locale['550']);
 	$i = 1; $k = 1;
 	echo "<table cellpadding='0' cellspacing='1' width='100%' class='tbl-border'>\n";
-	$result = dbquery("SELECT forum_id, forum_name, forum_order FROM ".DB_FORUMS." WHERE forum_cat='0' ORDER BY forum_order");
+	$result = dbquery("SELECT forum_id, forum_name, forum_description, forum_order FROM ".DB_FORUMS." WHERE forum_cat='0' ORDER BY forum_order");
 	if (dbrows($result) != 0) {
 		echo "<tr>\n<td class='tbl2'><strong>".$locale['551']."</strong></td>\n";
 		echo "<td align='center' colspan='2' width='1%' class='tbl2' style='white-space:nowrap'><strong>".$locale['552']."</strong></td>\n";
@@ -384,7 +392,8 @@ if (isset($_POST['save_cat'])) {
 		echo "</tr>\n";
 		$i = 1;
 		while ($data = dbarray($result)) {
-			echo "<tr>\n<td class='tbl2'><strong>".$data['forum_name']."</strong></td>\n";
+			echo "<tr>\n<td class='tbl2'><strong>".$data['forum_name']."</strong><br />\n";
+			echo ($data['forum_description'] ? "<span class='small'>".nl2br(parseubb($data['forum_description']))."</span>" : "")."</td>\n";
 			echo "<td align='center' width='1%' class='tbl2' style='white-space:nowrap'>".$data['forum_order']."</td>\n";
 			echo "<td align='center' width='1%' class='tbl2' style='white-space:nowrap'>\n";
 			if (dbrows($result) != 1) {

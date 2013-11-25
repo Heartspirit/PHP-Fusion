@@ -158,7 +158,7 @@ echo "<td class='tbl2 forum-caption' width='1%' style='white-space:nowrap'>".$lo
 if ($rows) {
 	$result = dbquery(
 		"SELECT t.*, tu1.user_name AS user_author, tu1.user_status AS status_author,
-		tu2.user_name AS user_lastuser, tu2.user_status AS status_lastuser
+		tu2.user_name AS user_lastuser, tu2.user_status AS status_lastuser, tu2.user_avatar AS user_avatar
 		FROM ".DB_THREADS." t
 		LEFT JOIN ".DB_USERS." tu1 ON t.thread_author = tu1.user_id
 		LEFT JOIN ".DB_USERS." tu2 ON t.thread_lastuser = tu2.user_id
@@ -228,8 +228,16 @@ if ($rows) {
 		echo "<td width='1%' class='tbl2' style='white-space:nowrap'>".profile_link($tdata['thread_author'], $tdata['user_author'], $tdata['status_author'])."</td>\n";
 		echo "<td align='center' width='1%' class='tbl1' style='white-space:nowrap'>".$tdata['thread_views']."</td>\n";
 		echo "<td align='center' width='1%' class='tbl2' style='white-space:nowrap'>".($tdata['thread_postcount']-1)."</td>\n";
-		echo "<td width='1%' class='tbl1' style='white-space:nowrap'>".showdate("forumdate", $tdata['thread_lastpost'])."<br />\n";
-		echo "<span class='small'>".$locale['406'].profile_link($tdata['thread_lastuser'], $tdata['user_lastuser'], $tdata['status_lastuser'])."</span></td>\n";
+		echo "<td width='1%' class='tbl1' style='white-space:nowrap'>";
+		// Show avatar of the last user that made a post
+		if ($settings['forum_last_post_avatar'] == 1) {
+			$avatar = IMAGES."avatars/noavatar50.png";
+			if ($tdata['user_avatar'] && file_exists(IMAGES."avatars/".$tdata['user_avatar']) && $tdata['status_lastuser']!=6 && $tdata['status_lastuser']!=5) {
+				$avatar = IMAGES."avatars/".$tdata['user_avatar'];
+			}
+			echo "<div class='lastpost-avatar flleft'><img src='".$avatar."' width='40' alt='".$locale['567']."' /></div>\n";
+		}
+		echo "<span class='lastpost-user'>".profile_link($tdata['thread_lastuser'], $tdata['user_lastuser'], $tdata['status_lastuser'])."</span><br />".showdate("forumdate", $tdata['thread_lastpost'])."</td>\n";
 		echo "</tr>\n";
 	}
 	echo "</table><!--sub_forum_table-->\n";

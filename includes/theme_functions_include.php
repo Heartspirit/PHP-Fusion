@@ -229,7 +229,7 @@ function panelbutton($state, $bname) {
 	return "<img src='".get_image("panel_".($state == "on" ? "off" : "on"))."' id='b_".$bname."' class='panelbutton' alt='' onclick=\"javascript:flipBox('".$bname."')\" />";
 }
 
-function panelstate($state, $bname) {
+function panelstate($state, $bname, $element = "div") {
 	$bname = preg_replace("/[^a-zA-Z0-9\s]/", "_", $bname);
 	if (isset($_COOKIE["fusion_box_".$bname])) {
 		if ($_COOKIE["fusion_box_".$bname] == "none") {
@@ -238,7 +238,7 @@ function panelstate($state, $bname) {
 			$state = "on";
 		}
 	}
-	return "<div id='box_".$bname."'".($state == "off" ? " style='display:none'" : "").">\n";
+	return "<$element id='box_".$bname."'".($state == "off" ? " style='display:none'" : "").">\n";
 }
 
 // v6 compatibility
