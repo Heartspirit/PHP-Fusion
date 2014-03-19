@@ -70,7 +70,7 @@ function mimeTypes() {
 		'tgz'	=>	array('application/x-tar', 'application/x-gzip-compressed'),
 		'xhtml'	=>	'application/xhtml+xml',
 		'xht'	=>	'application/xhtml+xml',
-		'zip'	=>	array('application/x-zip', 'application/zip', 'application/x-zip-compressed', 'application/s-compressed', 'multipart/x-zip'),
+		'zip'	=>	array('application/x-zip', 'application/zip', 'application/x-zip-compressed', 'application/s-compressed', 'multipart/x-zip', 'application/octet-stream'),
 		'rar'	=>	array('application/x-rar', 'application/rar', 'application/x-rar-compressed', 'application/octet-stream'),
 		'mid'	=>	'audio/midi',
 		'midi'	=>	'audio/midi',
@@ -159,7 +159,7 @@ function mimeTypes() {
 		'kml'	=>	array('application/vnd.google-earth.kml+xml', 'application/xml', 'text/xml'),
 		'ics'	=>	'text/calendar',
 		'zsh'	=>	'text/x-scriptzsh',
-		'7zip'	=>	array('application/x-compressed', 'application/x-zip-compressed', 'application/zip', 'multipart/x-zip'),
+		'7zip'	=>	array('application/x-compressed', 'application/x-zip-compressed', 'application/zip', 'multipart/x-zip', 'application/octet-stream'),
 		'cdr'	=>	array('application/cdr', 'application/coreldraw', 'application/x-cdr', 'application/x-coreldraw', 'image/cdr', 'image/x-cdr', 'zz-application/zz-winassoc-cdr'),
 		'wma'	=>	array('audio/x-ms-wma', 'video/x-ms-asf'),
 		'jar'	=>	array('application/java-archive', 'application/x-java-application', 'application/x-jar', 'application/x-compressed')
